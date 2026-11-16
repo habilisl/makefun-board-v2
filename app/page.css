@@ -1,22 +1,22 @@
 /* Later pages only. Injected when a bounty, leaderboard, or profile opens. */
-.sum{border:1px solid #0000001a;border-radius:20px;padding:12px 14px;margin:0 0 12px;background:#fff;color:#111111}
+.sum{border:1px solid #0000001a;border-radius:20px;padding:12px 14px;margin:0 0 18px;background:#fff;color:#111111}
 .sum.games{background:#FFB5C1}
 .sum.code{background:#B7E1D1}
 .sum.growth{background:#FFE59A}
 .sum.trading{background:#A9D3FF}
 .sum h1{font-size:1.4rem;line-height:1.15;margin:0;overflow-wrap:anywhere}
 .sum .meta{margin:0 0 4px;font-size:.85rem}
-.sum .facts{display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0 0}
-.sum .facts b{display:block;font-size:1.12rem;font-weight:800;line-height:1.15}
+.sum .band{display:flex;flex-direction:column;gap:18px;margin-top:16px}
+.sum .facts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0}
+.sum .facts b{display:block;font-size:1.12rem;font-weight:800;line-height:1.15;color:#111}
 .sum .facts b.pot{font-size:2rem;line-height:1}
-.sum .k{display:block;color:#333;font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.sum .k{display:block;color:#333;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
 .sum .when{display:block;color:#333;font-size:.75rem;font-weight:500}
-.sum .dates{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:6px;min-width:0;max-width:100%}
-.sum .dates table,.sum .dates tbody{display:flex;flex-wrap:wrap;gap:2px 12px;margin:0;min-width:0;max-width:100%}
-.sum .dates thead{display:none}
-.sum .dates tr{display:flex;flex-wrap:wrap;gap:4px 8px;min-width:0;max-width:100%}
-.sum .dates td{padding:0;border:0;font-size:.75rem;color:#333;min-width:0;overflow-wrap:anywhere}
-.sum .dates td:first-child{font-weight:800;color:#111111}
+.sum .tl{display:flex;flex-direction:column;gap:8px;min-width:0}
+.sum .tl p{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin:0}
+.sum .tl .k{display:inline;margin:0}
+.sum .tl .dot{color:#333;font-weight:700}
+.sum .tl b{color:#111;font-size:1rem;font-weight:800;line-height:1.4}
 .muted{color:#333;font-weight:700}
 .pill.on{color:#111111}
 .pill.off{color:#333}
@@ -24,14 +24,19 @@
 .split{display:grid;gap:12px;align-items:start}
 .box{background:#fff;border:1px solid #0000001a;border-radius:20px;padding:12px 14px;min-width:0;overflow:auto}
 .stand h2,.sec h2{font-size:1rem;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.box .sec h2{color:#333;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px}
 .sec{margin:14px 0}
+.box .sec{margin:18px 0}
 .box .sec:first-child{margin-top:0}
 .box .sec:last-child{margin-bottom:0}
 h1 .tk{width:32px;height:24px;margin-right:8px;vertical-align:middle}
+.box .prose{font-size:1rem;line-height:1.6;max-width:68ch;color:#111}
 .prose.clip{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .prose.clip.open{display:block;-webkit-line-clamp:unset;overflow:visible}
-.rm{margin-top:6px;padding:2px 10px;font-size:.75rem;font-weight:800}
-.pays{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.prose.clip > :first-child{margin-top:0}
+.prose.clip > :last-child{margin-bottom:0}
+.rm{margin-top:8px;padding:2px 10px;font-size:.75rem;font-weight:800}
+.pays{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .pp{color:#111;background:#FFE59A;border:1px solid #0000001a;border-radius:999px;padding:3px 9px;font-size:.75rem;font-weight:800}
 .pp:nth-child(4n+2){background:#FFB5C1}
 .pp:nth-child(4n+3){background:#B7E1D1}
@@ -95,6 +100,11 @@ h1 .tk{width:32px;height:24px;margin-right:8px;vertical-align:middle}
 .paylist li{background:#fff;border:1px solid #0000001a;border-radius:16px;padding:12px 14px;margin-top:8px}
 @media(min-width:721px){
 .split{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+}
+@media(min-width:960px){
+.sum .band{flex-direction:row;align-items:flex-start;gap:18px 36px}
+.sum .facts{flex:1.35 1 540px}
+.sum .tl{flex:1 1 500px}
 }
 @media(max-width:720px){
 .prof{grid-template-columns:1fr}

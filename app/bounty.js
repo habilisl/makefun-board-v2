@@ -81,27 +81,68 @@ function rewardsTable(comp) {
   return `<table class="pay"><thead>${head}<tbody>${body}</table>`;
 }
 
-function datesTable(comp) {
-  const rows = [];
-  const add = (k, v) => { if (v) rows.push([k, when(v)]); };
-  add('Opens', comp.opensAt || comp.opens_at);
-  if (comp.publishedAt && comp.publishedAt !== (comp.opensAt || comp.opens_at)) add('Published', comp.publishedAt);
-  add('Deadline', comp.deadline);
-  add('Resolved', comp.resolvedAt);
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function clockText(iso, year) {
+  const d = new Date(iso);
+  if (Number.isNaN(+d)) return '';
+  const p = n => String(n).padStart(2, '0');
+  const h = d.getUTCHours();
+  const y = d.getUTCFullYear();
+  const date = `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
+  const time = `${h % 12 || 12}:${p(d.getUTCMinutes())} ${h < 12 ? 'AM' : 'PM'}`;
+  return (y === year ? date : `${date}, ${y}`) + ', ' + time;
+}
+
+function spanText(start, end) {
+  const year = new Date().getUTCFullYear();
+  const a = start ? clockText(start, year) : '';
+  const b = end ? clockText(end, year) : '';
+  if (a && b) return `${a} – ${b} UTC`;
+  if (a || b) return `${a || b} UTC`;
+  return '';
+}
+
+function sameInstant(a, b) {
+  const ta = +new Date(a);
+  const tb = +new Date(b);
+  return Number.isFinite(ta) && ta === tb;
+}
+
+/** One row per phase. Opens/Deadline are omitted when they already bound a phase. */
+function timeline(comp) {
   const phases = Array.isArray(comp.phases) ? comp.phases : [];
-  let html = '';
-  if (rows.length) {
-    html += `<table class="pay"><thead><tr><th>When<th>Date<tbody>${rows.map(([k, v]) => `<tr><td>${esc(k)}<td>${esc(v)}`).join('')}</table>`;
-  }
+  const opens = comp.opensAt || comp.opens_at || '';
+  const deadline = comp.deadline || '';
+  const rows = [];
   if (phases.length) {
-    const body = phases.map(ph => {
-      const start = ph.startsAt || ph.starts_at;
-      const end = ph.endsAt || ph.ends_at;
-      return `<tr><td>${esc(ph.title || ph.key || '')}<td>${start ? esc(when(start)) : '—'}<td>${end ? esc(when(end)) : '—'}`;
-    }).join('');
-    html += `<table class="pay"><thead><tr><th>Phase<th>Starts<th>Ends<tbody>${body}</table>`;
+    const bounds = [];
+    for (const ph of phases) {
+      const start = ph.startsAt || ph.starts_at || '';
+      const end = ph.endsAt || ph.ends_at || '';
+      if (start) bounds.push(start);
+      if (end) bounds.push(end);
+      const text = spanText(start, end);
+      if (text) rows.push({ label: ph.title || ph.key || 'Phase', text });
+    }
+    const opensDup = !!(opens && bounds.some(t => sameInstant(t, opens)));
+    const deadDup = !!(deadline && bounds.some(t => sameInstant(t, deadline)));
+    if (!opensDup && !deadDup && (opens || deadline)) {
+      const text = spanText(opens, deadline);
+      if (text) rows.unshift({ label: 'Open', text });
+    } else if (!opensDup && opens) {
+      const text = spanText(opens, '');
+      if (text) rows.unshift({ label: 'Opens', text });
+    } else if (!deadDup && deadline) {
+      const text = spanText('', deadline);
+      if (text) rows.push({ label: 'Deadline', text });
+    }
+  } else {
+    const text = spanText(opens, deadline);
+    if (text) rows.push({ label: 'Open', text });
   }
-  return html;
+  if (!rows.length) return '';
+  return `<div class="tl">${rows.map(r => `<p><span class="k">${esc(r.label)}</span><span class="dot">·</span><b>${esc(r.text)}</b></p>`).join('')}</div>`;
 }
 
 export function render(comp, lb, slug) {
@@ -121,7 +162,7 @@ export function render(comp, lb, slug) {
   const note = asText(comp.rulesNote);
   const rewards = rewardsTable(comp);
   const split = payoutSplit(comp);
-  const dates = datesTable(comp);
+  const dates = timeline(comp);
   const board = lb
     ? leaderboard(entries, cols, PREVIEW)
     : '<p>Leaderboard unavailable.</p>';
@@ -135,13 +176,15 @@ export function render(comp, lb, slug) {
   return `<article class="sum ${tone(comp.category)}">
 ${bits.length || logo ? `<p class="meta">${logo}${bits.join(' · ')}</p>` : ''}
 <h1>${esc(title)}</h1>
+<div class="band">
 <div class="facts">
 <div><span class="k">Live pot</span><b class="pot">${usd(comp.potUsd ?? comp.rewardAmount)}</b></div>
 <div><span class="k">Entry fee</span><b${fee ? '' : ' class="muted"'}>${fee || 'No fee'}</b></div>
 <div><span class="k">Time left</span><b><time class="tick" datetime="${esc(comp.deadline)}">${left(comp.deadline)}</time></b><span class="when deadline">${esc(when(comp.deadline))}</span></div>
 <div><span class="k">Entries</span><b class="pill ${open ? 'on' : 'off'}" data-deadline="${esc(comp.deadline)}">${entriesLabel(comp.deadline)}</b>${count ? `<span class="when">${count}</span>` : ''}</div>
 </div>
-${dates ? `<div class="dates">${dates}</div>` : ''}
+${dates}
+</div>
 </article>
 <div class="split">
 ${about ? `<div class="box">${about}</div>` : ''}
