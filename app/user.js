@@ -76,7 +76,7 @@ ${extLinks(p)}
 <div><span class="k">Best</span><b>${best}</b></div>
 <div><span class="k">Paid</span><b class="pot">${usd(rec.prize_usd)}</b></div>
 </div></div>
-<section class="sec"><h2>Entries</h2>${rows.length ? rows.join('') : '<p class="empty"><i class="blob"></i> No public entries yet.</p>'}</section>
+<section class="sec"><h2>Entries</h2>${rows.length ? rows.join('') : '<p class="empty"><i class="tk"></i> No public entries yet.</p>'}</section>
 ${pays.length ? `<section class="sec"><h2>Payouts</h2><ul class="paylist">${pays.join('')}</ul></section>` : ''}`;
 }
 

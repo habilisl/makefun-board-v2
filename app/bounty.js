@@ -32,6 +32,37 @@ function rewardRows(comp) {
     .sort((a, b) => (a.place > b.place ? 1 : -1));
 }
 
+function ord(n) {
+  const v = Math.abs(+n) | 0;
+  const k = v % 100;
+  const s = k >= 11 && k <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][v % 10] || 'th';
+  return v + s;
+}
+
+function payoutSplit(comp) {
+  const groups = [];
+  for (const r of rewardRows(comp)) {
+    const amt = +(r.base != null && r.base !== '' ? r.base : r.amount);
+    if (!Number.isFinite(amt)) continue;
+    const n = +r.place;
+    const last = groups.at(-1);
+    const ok = Number.isFinite(n);
+    if (last && last.ok && ok && last.amt === amt && n === last.to + 1) last.to = n;
+    else groups.push({ from: ok ? n : 0, to: ok ? n : 0, amt, place: r.place, ok });
+  }
+  if (!groups.length) return '';
+  const shown = groups.slice(0, 8);
+  const rest = groups.length - shown.length;
+  const text = g => (
+    g.ok
+      ? (g.from === g.to ? `${ord(g.from)} ${usd(g.amt)}` : `${ord(g.from)}–${ord(g.to)} ${usd(g.amt)} each`)
+      : `${g.place} ${usd(g.amt)}`
+  );
+  const bits = shown.map(g => `<span class="pp">${esc(text(g))}</span>`);
+  if (rest) bits.push(`<span class="pp">+${rest} more</span>`);
+  return `<div class="pays" aria-label="Payout split">${bits.join('')}</div>`;
+}
+
 function rewardsTable(comp) {
   let rows = rewardRows(comp);
   if (!rows.length && (comp.rewardAmount != null || comp.potUsd != null)) {
@@ -89,6 +120,7 @@ export function render(comp, lb, slug) {
   const rules = asText(comp.rules);
   const note = asText(comp.rulesNote);
   const rewards = rewardsTable(comp);
+  const split = payoutSplit(comp);
   const dates = datesTable(comp);
   const board = lb
     ? leaderboard(entries, cols, PREVIEW)
@@ -96,7 +128,7 @@ export function render(comp, lb, slug) {
 
   const logo = sponsor.logo ? pic(sponsor.logo, '') : '';
   const about = [
-    description ? `<section class="sec"><h2>Description</h2><div class="prose">${md(description)}</div></section>` : '',
+    description ? `<section class="sec"><h2>Description</h2><div class="prose clip" id="desc">${md(description)}</div><button type="button" class="rm" aria-expanded="false" aria-controls="desc">Read more</button>${split}</section>` : split,
     rules || note ? `<section class="sec"><h2>Rules</h2>${note ? `<p>${esc(note)}</p>` : ''}<div class="prose">${md(rules)}</div></section>` : '',
     rewards ? `<section class="sec"><h2>Rewards</h2>${rewards}</section>` : '',
   ].join('');
@@ -129,6 +161,16 @@ export async function show(slug, root) {
     if (!alive()) return;
     if (compR.status !== 'fulfilled') throw compR.reason;
     root.innerHTML = render(compR.value, lbR.status === 'fulfilled' ? lbR.value : null, slug);
+    const rm = root.querySelector('.rm');
+    const clip = root.querySelector('.clip');
+    if (rm && clip) {
+      if (clip.scrollHeight <= clip.clientHeight + 1) rm.remove();
+      else rm.onclick = () => {
+        const open = clip.classList.toggle('open');
+        rm.textContent = open ? 'Show less' : 'Read more';
+        rm.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+    }
     clock(root, alive);
   } catch (e) {
     if (!alive()) return;
