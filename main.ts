@@ -9,7 +9,7 @@
 // (a leaderboard, profiles, speed, ease of use), put 3 PNG or JPEG screenshots of it running on live data in
 // screenshots/ (the first by name is the cover; shots.json says which views this starter's were taken of), and run it.
 //
-// Serve it locally with `node serve.ts`, then open http://localhost:8080.
+// Serve it locally with `node serve.ts --port 8780`, then open http://localhost:8780.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
