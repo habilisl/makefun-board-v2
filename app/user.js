@@ -6,9 +6,19 @@ function resultOf(s) {
   const bits = [];
   if (s.placement) bits.push('#' + s.placement);
   const score = scoreText(s.score);
-  if (score) bits.push(score);
-  if (s.prize_usd) bits.push(usd(s.prize_usd));
+  if (score && score !== '—') bits.push(score);
+  if (s.prize_usd) {
+    const money = usd(s.prize_usd);
+    if (money && money !== '—') bits.push(money);
+  }
   return bits.join(' · ');
+}
+
+/** 2 = a real score, 1 = placement or prize only, 0 = nothing to show. */
+function resultRank(s) {
+  const score = scoreText(s.score);
+  if (score && score !== '—') return 2;
+  return resultOf(s) ? 1 : 0;
 }
 
 function extLinks(p) {
@@ -32,17 +42,19 @@ export function render(p) {
   const rec = p.record || {};
   const avatarSrc = (p.avatar && (p.avatar.url || p.avatar.url_small)) || p.image;
   const sols = [...(p.solutions || [])].sort((a, b) => String(b.entered_at || '').localeCompare(String(a.entered_at || '')));
-  const seen = new Set();
-  const rows = [];
+  const bySlug = new Map();
   for (const s of sols) {
-    const id = s.submission_id;
-    if (id && seen.has(id)) continue;
-    if (id) seen.add(id);
+    const slug = s.competition && s.competition.slug;
+    if (!slug) continue;
+    const prev = bySlug.get(slug);
+    if (!prev || resultRank(s) > resultRank(prev)) bySlug.set(slug, s);
+  }
+  const rows = [];
+  for (const s of bySlug.values()) {
     const comp = s.competition || {};
-    if (!comp.slug) continue;
     const href = `#/bounty/${encodeURIComponent(comp.slug)}`;
-    const result = resultOf(s);
-    rows.push(`<tr><td class="nm"><a href="${esc(href)}">${esc(comp.title || comp.slug)}</a>${s.title ? ` <span class="sub">${esc(s.title)}</span>` : ''}</td><td class="sc">${result ? esc(result) : '—'}</td></tr>`);
+    const result = resultOf(s) || 'pending';
+    rows.push(`<tr><td class="nm"><a href="${esc(href)}">${esc(comp.title || comp.slug)}</a>${s.title ? ` <span class="sub">${esc(s.title)}</span>` : ''}</td><td class="sc">${esc(result)}</td></tr>`);
   }
   const pays = (p.payouts || []).filter(x => x && x.competition && x.competition.slug).map(x => {
     const href = `#/bounty/${encodeURIComponent(x.competition.slug)}`;

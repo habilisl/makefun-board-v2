@@ -4,47 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>makefun board</title>
-<style>
-html{color-scheme:dark}
-body{margin:0;background:#100e0c;color:#f4f0e6;font:16px/1.4 system-ui,sans-serif}
-a{color:inherit;text-decoration:none}
-header{display:flex;gap:16px;align-items:center;padding:12px 16px;position:sticky;top:0;background:#100e0c;border-bottom:1px solid #2e2922}
-.brand{color:#ffb11a;font-weight:800}
-nav a{font-weight:700;padding:6px 12px;border-radius:999px}
-nav a.on,button.on{background:#ffb11a;color:#1a1408}
-main{max-width:1040px;margin:auto;padding:16px 16px 48px}
-h1{font-size:1.5rem;margin:0 0 4px}
-.meta,label,.cat,.muted,th{color:#b7ad9c}
-.meta{margin:0 0 12px}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-button,select,input{font:inherit;color:inherit;background:#1b1814;border:1px solid #3a3428;border-radius:8px;padding:8px 10px;cursor:pointer}
-input{flex:1;min-width:8rem}
-table{width:100%;border-collapse:collapse}
-th,td{text-align:right;font-variant-numeric:tabular-nums}
-th:first-child,td:first-child{text-align:left}
-th{font-size:.72rem;text-transform:uppercase;}
-td{padding:11px 8px;border-top:1px solid #2e2922}
-tbody tr{cursor:pointer}
-tbody tr:hover{background:#1c1915}
-.pot{color:#ffb11a;font-size:1.75rem;font-weight:800}
-time{font-weight:700}
-.cat{margin-left:8px;font-size:.75rem}
-img{width:20px;height:20px;border-radius:4px;vertical-align:-4px;margin-right:6px}
-@media(max-width:720px){
-thead{display:none}
-tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:12px 0}
-td{border:0;padding:0;text-align:left}
-td:first-child{grid-column:1/-1}
-.pot{font-size:1.9rem}
-td[data-l]::before{content:attr(data-l);display:block;font-size:.68rem;font-weight:700;text-transform:uppercase}
-}
-</style>
+<style>html{color-scheme:dark}body{margin:0;background:#100e0c;color:#f4f0e6;font:16px/1.4 system-ui,sans-serif}a{color:inherit;text-decoration:none}header{display:flex;gap:16px;align-items:center;padding:12px 16px;position:sticky;top:0;background:#100e0c;border-bottom:1px solid #2e2922}.brand{color:#ffb11a;font-weight:800}.u{margin-left:8px;padding:1px 6px;border:1px solid #3a3428;border-radius:999px;color:#b7ad9c;font-size:.68rem;font-weight:700;text-transform:uppercase}nav a{font-weight:700;padding:6px 12px;border-radius:999px}nav a.on,button.on{background:#ffb11a;color:#1a1408}main{max-width:1040px;margin:auto;padding:16px 16px 48px}h1{font-size:1.5rem;margin:0 0 4px}.meta,label,.cat,.muted,th{color:#b7ad9c}.meta{margin:0 0 12px}.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}button,select,input{font:inherit;color:inherit;background:#1b1814;border:1px solid #3a3428;border-radius:8px;padding:8px 10px;cursor:pointer}input{flex:1;min-width:8rem}table{width:100%;border-collapse:collapse}th,td{text-align:right;font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}th{font-size:.72rem;text-transform:uppercase;}td{padding:11px 8px;border-top:1px solid #2e2922}tbody tr{cursor:pointer}tbody tr:hover{background:#1c1915}.pot{color:#ffb11a;font-size:1.75rem;font-weight:800}time{font-weight:700}.cat{margin-left:8px;font-size:.75rem}img{width:20px;height:20px;border-radius:4px;vertical-align:-4px;margin-right:6px}@media(max-width:720px){thead{display:none}tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:12px 0}td{border:0;padding:0;text-align:left}td:first-child{grid-column:1/-1}.pot{font-size:1.9rem}td[data-l]::before{content:attr(data-l);display:block;font-size:.68rem;font-weight:700;text-transform:uppercase}}</style>
 </head>
 <body>
-<header>
-  <a class="brand" href="#/">make.fun</a>
-  <nav><a id="n" href="#/">Board</a></nav>
-</header>
+<header><a class="brand" href="#/">make.fun<span class=u>unofficial</span></a><nav><a id="n" href="#/">Board</a></nav></header>
 <main id="app"></main>
 <script type="module">
 const id=document.querySelector('main'),nav=document.getElementById('n');
@@ -64,11 +27,11 @@ const stop=()=>{clearInterval(timer);timer=0};
 const row=b=>{const fee=+b.entryFeeUsd||0;return `<tr><td>${pic(b.sponsor&&b.sponsor.logo)}<a href="#/bounty/${encodeURIComponent(b.slug)}">${esc(b.title)}</a>${b.category?` <i class=cat>${esc(b.category)}</i>`:''}<td class=pot data-l=Pot>${usd(pot(b))}<td data-l=Fee${fee?'':' class=muted'}>${fee?usd(fee):'No fee'}<td data-l=Time><time datetime="${b.deadline}">${left(b.deadline)}</time><td data-l=Entries>${num(b.submissionCount,0)}`};
 function draw(list){const query=q.trim().toLowerCase(),shown=list.filter(b=>ahead(b)==(mode=='live')&&(!cat||b.category==cat)&&(!query||[b.title,b.slug,b.category,b.summary].join(' ').toLowerCase().includes(query)));shown.sort((a,b)=>sort=='fee'?(+b.entryFeeUsd||0)-(+a.entryFeeUsd||0):sort=='entries'?(b.submissionCount||0)-(a.submissionCount||0):sort=='time'?(+new Date(a.deadline)-+new Date(b.deadline))*(mode=='done'?-1:1):pot(b)-pot(a));id.querySelector('#m').textContent=shown.length+' '+mode+' · '+usd(shown.reduce((s,b)=>s+pot(b),0))+' pots';id.querySelector('#rows').innerHTML=shown.map(row).join('')||'<tr><td colspan=5>No matches'}
 function tick(list,g){if(g!=token)return;let dirty=0;for(const el of id.querySelectorAll('time')){const t=left(el.dateTime);el.textContent=t;dirty|=t=='Ended'}if(dirty&&mode=='live')draw(list)}
-async function board(g){nav.className='on';id.innerHTML='<p class=meta>Loading…</p>';
+async function board(g){nav.className='on';id.innerHTML='<p class=meta>Loading</p>';
 const list=await comps();if(g!=token)return;
 const cats=[...new Set(list.map(b=>b.category).filter(Boolean))].sort(),opt=(a,cur)=>a.map(s=>`<option value="${esc(s)}"${s==cur?' selected':''}>${esc(s[0].toUpperCase()+s.slice(1))}`).join('');id.innerHTML=`<h1>Board</h1><p class=meta id=m></p><div class=bar><button data-mode=live${mode=='live'?' class=on':''}>Live</button><button data-mode=done${mode=='done'?' class=on':''}>Done</button><select id=cat><option value="">All${opt(cats,cat)}</select><input id=q placeholder=Search value="${esc(q)}"><label>Sort <select id=sort>${opt(['pot','fee','time','entries'],sort)}</select></label></div><table><thead><tr><th>Bounty<th>Pot<th>Fee<th>Time<th>Entries<tbody id=rows></table>`;id.onclick=e=>{const m=e.target.dataset.mode;if(m){mode=m;for(const b of id.querySelectorAll('[data-mode]'))b.className=b.dataset.mode==mode?'on':'';draw(list);return}const a=e.target.closest('tr')?.querySelector('a');if(a&&!e.target.closest('a'))location.hash=a.getAttribute('href')};id.oninput=id.onchange=e=>{const k=e.target.id;if(k=='cat')cat=e.target.value;else if(k=='q')q=e.target.value;else if(k=='sort')sort=e.target.value;else return;draw(list)};draw(list);stop();timer=setInterval(()=>tick(list,g),1000);if(g==token)window.__shotReady=true}
 async function go(){const g=++token;window.__shotReady=false;stop();nav.className='';id.onclick=id.oninput=id.onchange=null;let path='/';try{path=decodeURIComponent(location.hash.slice(1)||'/')}catch{}path=path.replace(/\/+$/,'')||'/';
-const p=path.split('/').filter(Boolean);if(p.length)id.textContent='Loading…';try{if(p[0]=='bounty'&&p[2]=='leaderboard'&&!p[3]){const mod=await import('./ranks.js');await mod.show(p[1],id)}else if(p[0]=='bounty'&&p[1]&&!p[2]){const mod=await import('./bounty.js');await mod.show(p[1],id)}else if(p[0]=='u'&&p[1]&&!p[2]){const mod=await import('./user.js');await mod.show(p[1],id)}else if(!p.length){await board(g);return}else id.textContent='Not found.';if(g==token)window.__shotReady=true}catch{if(g!=token)return;id.textContent=p.length?'Not ready.':'Could not load.';window.__shotReady=true}}
+const p=path.split('/').filter(Boolean);if(p.length)id.textContent='Loading';try{if(p[0]=='bounty'&&p[2]=='leaderboard'&&!p[3]){const mod=await import('./ranks.js');await mod.show(p[1],id)}else if(p[0]=='bounty'&&p[1]&&!p[2]){const mod=await import('./bounty.js');await mod.show(p[1],id)}else if(p[0]=='u'&&p[1]&&!p[2]){const mod=await import('./user.js');await mod.show(p[1],id)}else if(!p.length){await board(g);return}else id.textContent='Not found.';if(g==token)window.__shotReady=true}catch{if(g!=token)return;id.textContent=p.length?'Not ready.':'Could not load.';window.__shotReady=true}}
 addEventListener('hashchange',go);go();
 </script>
 </body>
