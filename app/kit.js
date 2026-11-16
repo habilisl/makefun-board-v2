@@ -196,10 +196,10 @@ export function leaderboard(entries, cols, limit) {
   const heads = ['<th class="rk">Rank', '<th class="nm">Name', ...cols.map(c => `<th class="sc">${esc(c.title || c.key)}`)].join('');
   const body = shown.map(e => {
     const scores = cols.map(c => `<td class="sc">${scoreCell(c, e)}</td>`).join('');
-    return `<tr><td class="rk">${e.rank ?? '—'}</td><td class="nm">${nameCell(e)}</td>${scores}</tr>`;
+    return `<tr><td class="rk"><i>${e.rank ?? '—'}</i></td><td class="nm">${nameCell(e)}</td>${scores}</tr>`;
   }).join('');
   const span = 2 + cols.length;
-  const empty = `<tr><td colspan="${span}">No ranked entries yet</td></tr>`;
+  const empty = `<tr><td colspan="${span}"><span class="empty"><i class="blob"></i> No ranked entries yet</span></td></tr>`;
   return `<table class="lb"><thead><tr>${heads}</tr></thead><tbody>${body || empty}</tbody></table>`;
 }
 
@@ -224,7 +224,7 @@ export function clock(root, alive) {
 }
 
 export function fail(title, detail) {
-  return `<h1>${esc(title)}</h1><p>${esc(detail)}</p><p class="more"><a href="#/">Back to the board</a></p>`;
+  return `<h1><i class="blob"></i> ${esc(title)}</h1><p>${esc(detail)}</p><p class="more"><a href="#/">Back to the board</a></p>`;
 }
 
 export function asText(v) {

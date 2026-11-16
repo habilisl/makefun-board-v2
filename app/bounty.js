@@ -5,6 +5,11 @@ import {
 
 const PREVIEW = 10;
 
+function tone(c) {
+  const k = String(c || '').toLowerCase();
+  return k === 'games' || k === 'code' || k === 'growth' || k === 'trading' ? k : 'other';
+}
+
 function feeLabel(v) {
   const n = +v;
   if (!v || !Number.isFinite(n) || n === 0) return '';
@@ -90,7 +95,12 @@ export function render(comp, lb, slug) {
     : '<p>Leaderboard unavailable.</p>';
 
   const logo = sponsor.logo ? pic(sponsor.logo, '') : '';
-  return `<div class="hero"><div class="lead">
+  const about = [
+    description ? `<section class="sec"><h2>Description</h2><div class="prose">${md(description)}</div></section>` : '',
+    rules || note ? `<section class="sec"><h2>Rules</h2>${note ? `<p>${esc(note)}</p>` : ''}<div class="prose">${md(rules)}</div></section>` : '',
+    rewards ? `<section class="sec"><h2>Rewards</h2>${rewards}</section>` : '',
+  ].join('');
+  return `<article class="sum ${tone(comp.category)}">
 ${bits.length || logo ? `<p class="meta">${logo}${bits.join(' · ')}</p>` : ''}
 <h1>${esc(title)}</h1>
 <div class="facts">
@@ -98,14 +108,13 @@ ${bits.length || logo ? `<p class="meta">${logo}${bits.join(' · ')}</p>` : ''}
 <div><span class="k">Entry fee</span><b${fee ? '' : ' class="muted"'}>${fee || 'No fee'}</b></div>
 <div><span class="k">Time left</span><b><time class="tick" datetime="${esc(comp.deadline)}">${left(comp.deadline)}</time></b><span class="when deadline">${esc(when(comp.deadline))}</span></div>
 <div><span class="k">Entries</span><b class="pill ${open ? 'on' : 'off'}" data-deadline="${esc(comp.deadline)}">${entriesLabel(comp.deadline)}</b>${count ? `<span class="when">${count}</span>` : ''}</div>
-</div></div>
-<section class="stand" aria-label="Leaderboard"><h2>Leaderboard <a href="${esc(href)}">${linkText}</a></h2>${board}</section>
 </div>
-${description ? `<section class="sec"><h2>Description</h2><div class="prose">${md(description)}</div></section>` : ''}
-${rules || note ? `<section class="sec"><h2>Rules</h2>${note ? `<p>${esc(note)}</p>` : ''}<div class="prose">${md(rules)}</div></section>` : ''}
-${rewards ? `<section class="sec"><h2>Rewards</h2>${rewards}</section>` : ''}
-${dates ? `<section class="sec"><h2>Dates</h2>${dates}</section>` : ''}
-<p class="more"><a href="${esc(href)}">Full leaderboard</a></p>`;
+${dates ? `<div class="dates">${dates}</div>` : ''}
+</article>
+<div class="split">
+${about ? `<div class="box">${about}</div>` : ''}
+<section class="box stand" aria-label="Leaderboard"><h2>Leaderboard${total > PREVIEW ? ` <span class="sub">${linkText}</span>` : ''} <a class="go" href="${esc(href)}">Full leaderboard<i></i></a></h2>${board}</section>
+</div>`;
 }
 
 export async function show(slug, root) {

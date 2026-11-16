@@ -54,7 +54,7 @@ export function render(p) {
     const comp = s.competition || {};
     const href = `#/bounty/${encodeURIComponent(comp.slug)}`;
     const result = resultOf(s) || 'pending';
-    rows.push(`<tr><td class="nm"><a href="${esc(href)}">${esc(comp.title || comp.slug)}</a>${s.title ? ` <span class="sub">${esc(s.title)}</span>` : ''}</td><td class="sc">${esc(result)}</td></tr>`);
+    rows.push(`<a class="erow" href="${esc(href)}"><span>${esc(comp.title || comp.slug)}${s.title ? `<span class="sub">${esc(s.title)}</span>` : ''}</span><b>${esc(result)}</b></a>`);
   }
   const pays = (p.payouts || []).filter(x => x && x.competition && x.competition.slug).map(x => {
     const href = `#/bounty/${encodeURIComponent(x.competition.slug)}`;
@@ -62,20 +62,21 @@ export function render(p) {
     return `<li><a href="${esc(href)}">${esc(x.competition.title || x.competition.slug)}</a> <span class="sub">${esc(bits.join(' · '))}</span></li>`;
   });
   const best = rec.best_placement == null || rec.best_placement === '' ? '—' : num(rec.best_placement);
-  return `<div class="who">${avatar(avatarSrc, handle, 'ava')}<div>
+  const hue = (handle.charCodeAt(0) || 0) % 2 ? 'pink' : 'blue';
+  return `<div class="prof"><div class="who ${hue}">${avatar(avatarSrc, handle, 'ava')}<div>
 <h1>${esc(name || '@' + handle)}</h1>
 <p class="meta">${name ? '@' + esc(handle) : ''}${p.joined_at ? `${name ? ' · ' : ''}Joined ${esc(when(p.joined_at))}` : ''}</p>
 ${p.bio ? `<p class="bio">${esc(p.bio)}</p>` : ''}
 ${extLinks(p)}
 </div></div>
-<div class="facts">
+<div class="stats">
 <div><span class="k">Entered</span><b>${num(rec.competitions_entered)}</b></div>
 <div><span class="k">Placed</span><b>${num(rec.competitions_placed)}</b></div>
 <div><span class="k">Won</span><b>${num(rec.competitions_won)}</b></div>
 <div><span class="k">Best</span><b>${best}</b></div>
 <div><span class="k">Paid</span><b class="pot">${usd(rec.prize_usd)}</b></div>
-</div>
-<section class="sec"><h2>Entries</h2>${rows.length ? `<table class="lb"><thead><tr><th class="nm">Bounty<th class="sc">Result<tbody>${rows.join('')}</table>` : '<p class="meta">No public entries yet.</p>'}</section>
+</div></div>
+<section class="sec"><h2>Entries</h2>${rows.length ? rows.join('') : '<p class="empty"><i class="blob"></i> No public entries yet.</p>'}</section>
 ${pays.length ? `<section class="sec"><h2>Payouts</h2><ul class="paylist">${pays.join('')}</ul></section>` : ''}`;
 }
 

@@ -10,7 +10,7 @@ export function render(lb, slug) {
   return `<p class="meta"><a href="${esc(href)}">${esc(title)}</a></p>
 <h1>Leaderboard</h1>
 <p class="meta">${num(entries.length)} ranked${live ? ' · Live' : ''}</p>
-${leaderboard(entries, cols)}`;
+<div class="box">${leaderboard(entries, cols)}</div>`;
 }
 
 export async function show(slug, root) {
